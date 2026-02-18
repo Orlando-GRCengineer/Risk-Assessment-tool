@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<!-- © 2026 Orlando - GRC Risk Assessment Tool. All rights reserved. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Risk Assessment</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;700&display=swap');
+
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2236;
+    --border: #1f2d45;
+    --accent: #00e5ff;
+    --accent2: #ff4d6d;
+    --accent3: #7fff6e;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --critical: #ff4d6d;
+    --high: #ff9f40;
+    --medium: #ffd166;
+    --low: #7fff6e;
+    --info: #00e5ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+      radial-gradient(ellipse at 10% 20%, rgba(0,229,255,0.04) 0%, transparent 50%),
+      radial-gradient(ellipse at 90% 80%, rgba(255,77,109,0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  header {
+    margin-bottom: 2.5rem;
+    border-left: 3px solid var(--accent);
+    padding-left: 1.25rem;
+    animation: fadeIn 0.6s ease;
+  }
+
+  header .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  header h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-top: 0.4rem;
+  }
+
+  /* Summary Dashboard */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.7s ease 0.1s both;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    transition: border-color 0.2s;
+  }
+
+  .summary-card .count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .summary-card .label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.3rem;
+  }
+
+  .summary-card.critical .count { color: var(--critical); }
+  .summary-card.high .count { color: var(--high); }
+  .summary-card.medium .count { color: var(--medium); }
+  .summary-card.low .count { color: var(--low); }
+
+  /* Meta fields */
+  .meta-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    animation: fadeIn 0.7s ease 0.15s both;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .field label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .field input, .field select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .field input:focus, .field select:focus {
+    border-color: var(--accent);
+  }
+
+  .field select option { background: var(--surface2); }
+
+  /* Risk Table */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    animation: fadeIn 0.7s ease 0.2s both;
+  }
+
+  .section-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .btn {
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    padding: 0.4rem 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn:hover {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .btn.danger {
+    border-color: var(--critical);
+    color: var(--critical);
+  }
+  .btn.danger:hover {
+    background: var(--critical);
+    color: #fff;
+  }
+
+  .risk-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow-x: auto;
+    animation: fadeIn 0.7s ease 0.25s both;
+    margin-bottom: 2rem;
+  }
+
+  table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: var(--surface2);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.67rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.9rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  tbody td {
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+
+  tbody td input, tbody td select, tbody td textarea {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 0.35rem 0.6rem;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.85rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: none;
+  }
+
+  tbody td input:focus, tbody td select:focus, tbody td textarea:focus {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.04);
+  }
+
+  tbody td select option { background: var(--surface2); }
+
+  .col-num    { width: 36px; }
+  .col-threat { min-width: 200px; }
+  .col-cat    { min-width: 170px; }
+  .col-lik    { width: 100px; text-align: center; }
+  .col-imp    { width: 100px; text-align: center; }
+  .col-score  { width: 70px; text-align: center; }
+  .col-rating { width: 110px; }
+  .col-owner  { min-width: 130px; }
+  .col-mit    { min-width: 210px; }
+  .col-status { min-width: 130px; }
+  .col-del    { width: 90px; text-align: center; }
+
+  .risk-badge {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.6rem;
+    border-radius: 100px;
+    border: 1px solid;
+  }
+
+  .badge-critical { color: var(--critical); border-color: var(--critical); background: rgba(255,77,109,0.1); }
+  .badge-high { color: var(--high); border-color: var(--high); background: rgba(255,159,64,0.1); }
+  .badge-medium { color: var(--medium); border-color: var(--medium); background: rgba(255,209,102,0.1); }
+  .badge-low { color: var(--low); border-color: var(--low); background: rgba(127,255,110,0.1); }
+
+  .score-cell {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* Risk Matrix */
+  .matrix-section {
+    margin-bottom: 2rem;
+    animation: fadeIn 0.7s ease 0.3s both;
+  }
+
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 40px repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr) 40px 28px;
+    gap: 3px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    max-width: 700px;
+  }
+
+  .matrix-cell {
+    border-radius: 4px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    position: relative;
+    cursor: default;
+    transition: transform 0.15s;
+  }
+
+  .matrix-cell:hover { transform: scale(1.05); z-index: 2; }
+
+  .axis-label {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .y-axis-title {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    grid-row: 1 / 6;
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .x-axis-title {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    grid-row: 7;
+    grid-column: 2 / 7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 0.1rem;
+  }
+
+  .dot-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid rgba(255,255,255,0.8);
+    position: absolute;
+    animation: pulse 1.5s infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0a0e1a;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.3); }
+  }
+
+  /* Export / notes */
+  .notes-section {
+    margin-bottom: 2rem;
+    animation: fadeIn 0.7s ease 0.35s both;
+  }
+
+  .notes-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.875rem;
+    width: 100%;
+    min-height: 80px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .notes-area:focus { border-color: var(--accent); }
+
+  .actions {
+    display: flex;
+    gap: 0.75rem;
+    animation: fadeIn 0.7s ease 0.4s both;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    border: none;
+    color: var(--bg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    padding: 0.6rem 1.4rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .row-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    width: 24px;
+  }
+
+  @media (max-width: 700px) {
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .meta-row { grid-template-columns: 1fr; }
+  }
+
+  /* Expandable Mitigation Cell */
+  .mit-cell {
+    position: relative;
+  }
+
+  .mit-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.2s, background 0.2s;
+    min-height: 32px;
+  }
+
+  .mit-preview:hover {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.04);
+  }
+
+  .mit-preview-text {
+    font-size: 0.82rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+    flex: 1;
+  }
+
+  .mit-preview-text.empty {
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .mit-arrow {
+    font-size: 0.65rem;
+    color: var(--accent);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .mit-arrow.open {
+    transform: rotate(180deg);
+  }
+
+  .mit-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    min-width: 280px;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.75rem;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  .mit-dropdown.open {
+    display: block;
+  }
+
+  .mit-dropdown label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .mit-dropdown textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 0.6rem;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.82rem;
+    width: 100%;
+    min-height: 90px;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+
+  .mit-dropdown textarea:focus {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.04);
+  }
+
+  .mit-dropdown-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
+
+  .mit-save-btn {
+    background: var(--accent);
+    border: none;
+    color: var(--bg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .mit-save-btn:hover { opacity: 0.8; }
+
+
+  /* Expandable Owner Cell */
+  .owner-cell { position: relative; }
+
+  .owner-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.2s, background 0.2s;
+    min-height: 32px;
+  }
+
+  .owner-preview:hover {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.04);
+  }
+
+  .owner-preview-text {
+    font-size: 0.82rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+    flex: 1;
+  }
+
+  .owner-preview-text.empty { color: var(--muted); font-style: italic; }
+
+  .owner-arrow {
+    font-size: 0.65rem;
+    color: var(--accent);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .owner-arrow.open { transform: rotate(180deg); }
+
+  .owner-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    min-width: 240px;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 0.75rem;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  .owner-dropdown.open { display: block; }
+
+  .owner-dropdown label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .owner-dropdown textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 0.6rem;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.82rem;
+    width: 100%;
+    min-height: 70px;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s;
+  }
+
+  .owner-dropdown textarea:focus {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.04);
+  }
+
+  .owner-dropdown-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
+
+  .owner-save-btn {
+    background: var(--accent);
+    border: none;
+    color: var(--bg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .owner-save-btn:hover { opacity: 0.8; }
+
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="label">// risk assessment</div>
+    <h1>Risk Assessment</h1>
+    <p>Identify, score, and track risks across your organization.</p>
+  </header>
+
+  <!-- Summary Dashboard -->
+  <div class="summary-grid">
+    <div class="summary-card critical">
+      <div class="count" id="cnt-critical">0</div>
+      <div class="label">Critical</div>
+    </div>
+    <div class="summary-card high">
+      <div class="count" id="cnt-high">0</div>
+      <div class="label">High</div>
+    </div>
+    <div class="summary-card medium">
+      <div class="count" id="cnt-medium">0</div>
+      <div class="label">Medium</div>
+    </div>
+    <div class="summary-card low">
+      <div class="count" id="cnt-low">0</div>
+      <div class="label">Low</div>
+    </div>
+  </div>
+
+  <!-- Meta Fields -->
+  <div class="meta-row">
+    <div class="field">
+      <label>Organization / System</label>
+      <input type="text" id="org" placeholder="e.g. Acme Corp — Cloud Infrastructure">
+    </div>
+    <div class="field">
+      <label>Assessed By</label>
+      <input type="text" id="assessor" placeholder="Name or team">
+    </div>
+    <div class="field">
+      <label>Assessment Date</label>
+      <input type="date" id="adate">
+    </div>
+  </div>
+
+  <!-- Risk Register Table -->
+  <div class="section-header">
+    <span class="section-title">// risk register</span>
+    <button class="btn" onclick="addRow()">+ Add Risk</button>
+  </div>
+
+  <div class="risk-table-wrap">
+    <table id="risk-table">
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th class="col-threat">Risk / Threat</th>
+          <th class="col-cat">Category</th>
+          <th class="col-lik">Likelihood (1–5)</th>
+          <th class="col-imp">Impact (1–5)</th>
+          <th class="col-score">Score</th>
+          <th class="col-rating">Rating</th>
+          <th class="col-owner">Owner</th>
+          <th class="col-mit">Mitigation</th>
+          <th class="col-status">Status</th>
+          <th class="col-del">Delete</th>
+        </tr>
+      </thead>
+      <tbody id="risk-body"></tbody>
+    </table>
+  </div>
+
+  <!-- Risk Matrix -->
+  <div class="matrix-section">
+    <div class="section-header">
+      <span class="section-title">// risk matrix</span>
+    </div>
+    <div class="matrix-grid" id="matrix-grid"></div>
+  </div>
+
+  <!-- Notes -->
+  <div class="notes-section">
+    <div class="section-header">
+      <span class="section-title">// notes &amp; recommendations</span>
+    </div>
+    <textarea class="notes-area" id="notes" placeholder="Add overall findings, recommendations, or action items..."></textarea>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn-primary" onclick="exportCSV()">Export CSV</button>
+    <button class="btn" onclick="printReport()">Print / Save PDF</button>
+    <button class="btn danger" onclick="clearAll()">Clear All</button>
+  </div>
+
+</div>
+
+<script>
+const CATEGORIES = ['Access Control','Network Security','Data Protection','Endpoint Security','Application Security','Physical Security','Supply Chain','Compliance / Regulatory','Incident Response','Social Engineering'];
+const STATUSES = ['Open','In Progress','Mitigated','Accepted'];
+
+let rows = [];
+let rowCounter = 0;
+
+const defaultRisks = [
+  { threat: 'Phishing / Credential Theft', cat: 'Social Engineering', l: 4, i: 4, owner: '', mitigation: 'MFA, security awareness training', status: 'Open' },
+  { threat: 'Unpatched Software Vulnerabilities', cat: 'Endpoint Security', l: 3, i: 5, owner: '', mitigation: 'Patch management policy, automated scanning', status: 'Open' },
+  { threat: 'Insider Threat / Privilege Abuse', cat: 'Access Control', l: 2, i: 5, owner: '', mitigation: 'Least privilege, UEBA monitoring', status: 'Open' },
+  { threat: 'Ransomware Attack', cat: 'Endpoint Security', l: 3, i: 5, owner: '', mitigation: 'Backups, EDR, network segmentation', status: 'Open' },
+  { threat: 'Misconfigured Cloud Storage', cat: 'Data Protection', l: 3, i: 4, owner: '', mitigation: 'CSPM tooling, cloud security review', status: 'Open' },
+  { threat: 'Third-Party Vendor Breach', cat: 'Supply Chain', l: 2, i: 4, owner: '', mitigation: 'Vendor risk assessments, contract clauses', status: 'Open' },
+];
+
+function getRating(score) {
+  if (score >= 20) return 'Critical';
+  if (score >= 12) return 'High';
+  if (score >= 6) return 'Medium';
+  return 'Low';
+}
+
+function getBadgeClass(rating) {
+  return 'badge-' + rating.toLowerCase();
+}
+
+function getScoreColor(score) {
+  if (score >= 20) return 'var(--critical)';
+  if (score >= 12) return 'var(--high)';
+  if (score >= 6) return 'var(--medium)';
+  return 'var(--low)';
+}
+
+function addRow(data = {}) {
+  rowCounter++;
+  const id = rowCounter;
+  const row = {
+    id,
+    threat: data.threat || '',
+    cat: data.cat || CATEGORIES[0],
+    l: data.l || 3,
+    i: data.i || 3,
+    owner: data.owner || '',
+    mitigation: data.mitigation || '',
+    status: data.status || 'Open'
+  };
+  rows.push(row);
+  renderTable();
+  updateSummary();
+  renderMatrix();
+}
+
+function removeRow(id) {
+  rows = rows.filter(r => r.id !== id);
+  renderTable();
+  updateSummary();
+  renderMatrix();
+}
+
+function updateRow(id, field, value) {
+  const row = rows.find(r => r.id === id);
+  if (!row) return;
+  row[field] = field === 'l' || field === 'i' ? parseInt(value) : value;
+  updateSummary();
+  renderMatrix();
+  // update score + badge in table
+  const score = row.l * row.i;
+  const rating = getRating(score);
+  const scoreEl = document.getElementById(`score-${id}`);
+  const badgeEl = document.getElementById(`badge-${id}`);
+  if (scoreEl) {
+    scoreEl.textContent = score;
+    scoreEl.style.color = getScoreColor(score);
+  }
+  if (badgeEl) {
+    badgeEl.textContent = rating;
+    badgeEl.className = 'risk-badge ' + getBadgeClass(rating);
+  }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('risk-body');
+  tbody.innerHTML = '';
+  rows.forEach((row, idx) => {
+    const score = row.l * row.i;
+    const rating = getRating(score);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="row-num">${idx + 1}</td>
+      <td><input type="text" value="${escHtml(row.threat)}" placeholder="Describe threat..." onchange="updateRow(${row.id},'threat',this.value)" style="min-width:220px"></td>
+      <td>
+        <select onchange="updateRow(${row.id},'cat',this.value)" style="min-width:180px">
+          ${CATEGORIES.map(c => `<option value="${c}" ${c===row.cat?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </td>
+      <td style="text-align:center">
+        <select onchange="updateRow(${row.id},'l',this.value)" style="width:50px;text-align:center">
+          ${[1,2,3,4,5].map(n=>`<option value="${n}" ${n===row.l?'selected':''}>${n}</option>`).join('')}
+        </select>
+      </td>
+      <td style="text-align:center">
+        <select onchange="updateRow(${row.id},'i',this.value)" style="width:50px;text-align:center">
+          ${[1,2,3,4,5].map(n=>`<option value="${n}" ${n===row.i?'selected':''}>${n}</option>`).join('')}
+        </select>
+      </td>
+      <td class="score-cell" id="score-${row.id}" style="color:${getScoreColor(score)}">${score}</td>
+      <td><span class="risk-badge ${getBadgeClass(rating)}" id="badge-${row.id}">${rating}</span></td>
+      <td class="owner-cell" style="position:relative;min-width:130px">
+        <div class="owner-preview" onclick="toggleOwner(${row.id}, this)">
+          <span class="owner-preview-text ${row.owner ? '' : 'empty'}" id="owner-preview-${row.id}">${row.owner ? escHtml(row.owner).substring(0,25) + (row.owner.length > 25 ? '…' : '') : 'Add owner...'}</span>
+          <span class="owner-arrow" id="owner-arrow-${row.id}">▼</span>
+        </div>
+        <div class="owner-dropdown" id="owner-drop-${row.id}">
+          <label>Owner / Responsible Party</label>
+          <textarea id="owner-text-${row.id}" placeholder="Name, team, or role responsible...">${escHtml(row.owner)}</textarea>
+          <div class="owner-dropdown-footer">
+            <button class="owner-save-btn" onclick="saveOwner(${row.id})">Save ✓</button>
+          </div>
+        </div>
+      </td>
+      <td class="mit-cell" style="position:relative;min-width:210px">
+        <div class="mit-preview" onclick="toggleMit(${row.id}, this)">
+          <span class="mit-preview-text ${row.mitigation ? '' : 'empty'}" id="mit-preview-${row.id}">${row.mitigation ? escHtml(row.mitigation).substring(0,40) + (row.mitigation.length > 40 ? '…' : '') : 'Add mitigation...'}</span>
+          <span class="mit-arrow" id="mit-arrow-${row.id}">▼</span>
+        </div>
+        <div class="mit-dropdown" id="mit-drop-${row.id}">
+          <label>Mitigation / Controls</label>
+          <textarea id="mit-text-${row.id}" placeholder="Describe controls, actions, or mitigations...">${escHtml(row.mitigation)}</textarea>
+          <div class="mit-dropdown-footer">
+            <button class="mit-save-btn" onclick="saveMit(${row.id})">Save ✓</button>
+          </div>
+        </div>
+      </td>
+      <td>
+        <select onchange="updateRow(${row.id},'status',this.value)" style="min-width:130px">
+          ${STATUSES.map(s=>`<option value="${s}" ${s===row.status?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td style="text-align:center"><button class="btn danger" onclick="removeRow(${row.id})" style="padding:0.35rem 0.8rem;font-size:0.72rem;letter-spacing:0.05em">🗑 Delete</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function updateSummary() {
+  const counts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+  rows.forEach(r => { counts[getRating(r.l * r.i)]++; });
+  document.getElementById('cnt-critical').textContent = counts.Critical;
+  document.getElementById('cnt-high').textContent = counts.High;
+  document.getElementById('cnt-medium').textContent = counts.Medium;
+  document.getElementById('cnt-low').textContent = counts.Low;
+}
+
+function renderMatrix() {
+  const grid = document.getElementById('matrix-grid');
+  grid.innerHTML = '';
+
+  // Build a set of (l,i) positions from current risks
+  const positions = rows.map(r => ({ l: r.l, i: r.i }));
+
+  // Y-axis title
+  const yTitle = document.createElement('div');
+  yTitle.className = 'y-axis-title';
+  yTitle.textContent = 'Impact →';
+  grid.appendChild(yTitle);
+
+  // Matrix cells (impact 5 top, likelihood 1 left)
+  for (let imp = 5; imp >= 1; imp--) {
+    for (let lik = 1; lik <= 5; lik++) {
+      const score = lik * imp;
+      const cell = document.createElement('div');
+      cell.className = 'matrix-cell';
+      
+      let bg;
+      if (score >= 20) bg = 'rgba(255,77,109,0.25)';
+      else if (score >= 12) bg = 'rgba(255,159,64,0.2)';
+      else if (score >= 6) bg = 'rgba(255,209,102,0.18)';
+      else bg = 'rgba(127,255,110,0.15)';
+      
+      cell.style.background = bg;
+      cell.style.color = score >= 20 ? 'var(--critical)' : score >= 12 ? 'var(--high)' : score >= 6 ? 'var(--medium)' : 'var(--low)';
+      cell.textContent = score;
+
+      // Check if any risks fall here
+      const count = positions.filter(p => p.l === lik && p.i === imp).length;
+      if (count > 0) {
+        const dot = document.createElement('div');
+        dot.className = 'dot-indicator';
+        dot.style.top = '4px';
+        dot.style.right = '4px';
+        if (count > 1) {
+          dot.textContent = count;
+          dot.style.fontSize = '0.75rem';
+          dot.style.width = '20px';
+          dot.style.height = '20px';
+          dot.style.display = 'flex';
+          dot.style.alignItems = 'center';
+          dot.style.justifyContent = 'center';
+        }
+        cell.appendChild(dot);
+      }
+
+      cell.title = `Likelihood: ${lik}, Impact: ${imp}, Score: ${score}`;
+      grid.appendChild(cell);
+    }
+  }
+
+  // X-axis labels
+  const emptyCorner = document.createElement('div');
+  grid.appendChild(emptyCorner);
+  for (let lik = 1; lik <= 5; lik++) {
+    const lbl = document.createElement('div');
+    lbl.className = 'axis-label';
+    lbl.textContent = lik;
+    grid.appendChild(lbl);
+  }
+
+  // X-axis title
+  const xTitle = document.createElement('div');
+  xTitle.className = 'x-axis-title';
+  xTitle.textContent = 'Likelihood →';
+  grid.appendChild(xTitle);
+}
+
+function exportCSV() {
+  const org = document.getElementById('org').value;
+  const assessor = document.getElementById('assessor').value;
+  const date = document.getElementById('adate').value;
+  let csv = `Risk Assessment\nOrganization: ${org}\nAssessor: ${assessor}\nDate: ${date}\n\n`;
+  csv += '#,Risk / Threat,Category,Likelihood,Impact,Score,Rating,Owner,Mitigation,Status\n';
+  rows.forEach((r, i) => {
+    const score = r.l * r.i;
+    csv += `${i+1},"${r.threat}","${r.cat}",${r.l},${r.i},${score},${getRating(score)},"${r.owner}","${r.mitigation}","${r.status}"\n`;
+  });
+  const notes = document.getElementById('notes').value;
+  if (notes) csv += `\nNotes:\n"${notes}"\n`;
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'cybersecurity-risk-assessment.csv';
+  a.click();
+}
+
+function printReport() {
+  window.print();
+}
+
+function clearAll() {
+  if (!confirm('Clear all risks? This cannot be undone.')) return;
+  rows = [];
+  rowCounter = 0;
+  renderTable();
+  updateSummary();
+  renderMatrix();
+}
+
+// Init
+document.getElementById('adate').value = new Date().toISOString().split('T')[0];
+defaultRisks.forEach(r => addRow(r));
+
+function toggleMit(id, previewEl) {
+  const drop = document.getElementById('mit-drop-' + id);
+  const arrow = document.getElementById('mit-arrow-' + id);
+  const isOpen = drop.classList.contains('open');
+
+  // Close all other open dropdowns first
+  document.querySelectorAll('.mit-dropdown.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.mit-arrow.open').forEach(a => a.classList.remove('open'));
+
+  if (!isOpen) {
+    drop.classList.add('open');
+    arrow.classList.add('open');
+    document.getElementById('mit-text-' + id).focus();
+  }
+}
+
+function saveMit(id) {
+  const val = document.getElementById('mit-text-' + id).value;
+  updateRow(id, 'mitigation', val);
+  const preview = document.getElementById('mit-preview-' + id);
+  preview.textContent = val ? (val.substring(0, 40) + (val.length > 40 ? '…' : '')) : 'Add mitigation...';
+  preview.className = 'mit-preview-text' + (val ? '' : ' empty');
+  document.getElementById('mit-drop-' + id).classList.remove('open');
+  document.getElementById('mit-arrow-' + id).classList.remove('open');
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.mit-cell')) {
+    document.querySelectorAll('.mit-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.mit-arrow.open').forEach(a => a.classList.remove('open'));
+  }
+});
+
+
+function toggleOwner(id, previewEl) {
+  const drop = document.getElementById('owner-drop-' + id);
+  const arrow = document.getElementById('owner-arrow-' + id);
+  const isOpen = drop.classList.contains('open');
+
+  document.querySelectorAll('.owner-dropdown.open').forEach(d => d.classList.remove('open'));
+  document.querySelectorAll('.owner-arrow.open').forEach(a => a.classList.remove('open'));
+
+  if (!isOpen) {
+    drop.classList.add('open');
+    arrow.classList.add('open');
+    document.getElementById('owner-text-' + id).focus();
+  }
+}
+
+function saveOwner(id) {
+  const val = document.getElementById('owner-text-' + id).value;
+  updateRow(id, 'owner', val);
+  const preview = document.getElementById('owner-preview-' + id);
+  preview.textContent = val ? (val.substring(0, 25) + (val.length > 25 ? '…' : '')) : 'Add owner...';
+  preview.className = 'owner-preview-text' + (val ? '' : ' empty');
+  document.getElementById('owner-drop-' + id).classList.remove('open');
+  document.getElementById('owner-arrow-' + id).classList.remove('open');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.owner-cell')) {
+    document.querySelectorAll('.owner-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.owner-arrow.open').forEach(a => a.classList.remove('open'));
+  }
+});
+
+</script>
+
+<div style="text-align:center; padding: 2rem 0 1rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #64748b; letter-spacing: 0.1em;">
+  © 2026 Orlando · GRC Risk Assessment Tool · All Rights Reserved
+</div>
+
+</body>
+</html>
