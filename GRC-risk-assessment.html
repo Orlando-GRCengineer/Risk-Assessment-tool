@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <!-- © 2026 Orlando - GRC Risk Assessment Tool. All rights reserved. -->
 <html lang="en">
 <head>
@@ -211,9 +211,20 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 420px;
     animation: fadeIn 0.7s ease 0.25s both;
     margin-bottom: 2rem;
   }
+
+  /* Sticky header so columns stay visible while scrolling */
+  #risk-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--surface2);
+  }
+
 
   table {
     width: 100%;
@@ -270,6 +281,7 @@
   tbody td select option { background: var(--surface2); }
 
   .col-num    { width: 36px; }
+  .col-id     { min-width: 90px; }
   .col-threat { min-width: 200px; }
   .col-cat    { min-width: 170px; }
   .col-lik    { width: 100px; text-align: center; }
@@ -305,11 +317,7 @@
     text-align: center;
   }
 
-  /* Risk Matrix */
-  .matrix-section {
-    margin-bottom: 2rem;
-    animation: fadeIn 0.7s ease 0.3s both;
-  }
+
 
   .matrix-grid {
     display: grid;
@@ -320,7 +328,7 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 1rem;
-    max-width: 700px;
+    flex: 1;
   }
 
   .matrix-cell {
@@ -698,6 +706,646 @@
 
   .owner-save-btn:hover { opacity: 0.8; }
 
+
+  /* Quantitative Risk Section */
+  .quant-section {
+    margin-bottom: 2rem;
+    animation: fadeIn 0.7s ease 0.3s both;
+  }
+
+  .quant-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .quant-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: border-color 0.2s;
+  }
+
+  .quant-card:hover { border-color: var(--accent); }
+
+  .quant-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .quant-card-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .quant-card-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.15rem 0.6rem;
+  }
+
+  .quant-formula {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+    background: var(--surface2);
+    border-radius: 4px;
+    padding: 0.4rem 0.75rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  .quant-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .quant-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .quant-input-row label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    width: 180px;
+    flex-shrink: 0;
+  }
+
+  .quant-input-row input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 0.7rem;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .quant-input-row input:focus {
+    border-color: var(--accent);
+    background: rgba(0,229,255,0.04);
+  }
+
+  .quant-result {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+  }
+
+  .quant-result-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .quant-result-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .quant-description {
+    font-size: 0.92rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .quant-summary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .quant-summary-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .quant-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+
+  .quant-summary-item {
+    text-align: center;
+  }
+
+  .quant-summary-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .quant-summary-lbl {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 0.2rem;
+  }
+
+  @media (max-width: 700px) {
+    .quant-grid { grid-template-columns: 1fr; }
+    .quant-summary-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+
+
+
+  /* Status Color Styles */
+  .status-open        { color: #ff4d6d; border-color: #ff4d6d !important; background: rgba(255,77,109,0.08) !important; }
+  .status-inprogress  { color: #ffd166; border-color: #ffd166 !important; background: rgba(255,209,102,0.08) !important; }
+  .status-mitigated   { color: #ff9f40; border-color: #ff9f40 !important; background: rgba(255,159,64,0.08) !important; }
+  .status-accepted    { color: #7fff6e; border-color: #7fff6e !important; background: rgba(127,255,110,0.08) !important; }
+
+  /* Due Date */
+  .col-due { min-width: 130px; }
+
+  /* Chart */
+  .chart-section { margin-bottom: 2rem; animation: fadeIn 0.7s ease 0.3s both; }
+  .chart-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+
+
+  /* Matrix + Chart Side by Side */
+  .matrix-chart-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    align-items: start;
+    animation: fadeIn 0.7s ease 0.3s both;
+  }
+
+  .matrix-col {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chart-col {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 458px;
+    height: 458px;
+  }
+
+  .chart-col .chart-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .chart-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    flex: 1;
+    overflow-y: auto;
+    max-height: 320px;
+    padding-right: 0.25rem;
+  }
+
+
+  .chart-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 1;
+  }
+
+  .chart-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    color: var(--text);
+    width: 175px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chart-bar-track {
+    flex: 1;
+    background: var(--surface2);
+    border-radius: 100px;
+    height: 28px;
+    overflow: hidden;
+  }
+
+  .chart-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 0.6s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 0.6rem;
+    min-width: 32px;
+  }
+
+  .chart-bar-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0a0e1a;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+    padding-top: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .chart-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .chart-legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 900px) {
+    .matrix-chart-row { grid-template-columns: 1fr; }
+  }
+
+
+  /* Filter Bar */
+  .filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    animation: fadeIn 0.7s ease 0.2s both;
+  }
+
+  .filter-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.45rem 0.85rem;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s;
+    flex: 1;
+    min-width: 160px;
+  }
+
+  .filter-input:focus { border-color: var(--accent); }
+  .filter-input option { background: var(--surface2); }
+
+  .filter-count {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+
+
+  /* Progress Tracker */
+  .progress-section {
+    margin-bottom: 2rem;
+    animation: fadeIn 0.7s ease 0.15s both;
+  }
+
+  .progress-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .progress-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .progress-pct {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 12px;
+    background: var(--surface2);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: linear-gradient(90deg, var(--accent), #7fff6e);
+    transition: width 0.6s ease;
+  }
+
+  .progress-stats {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .progress-stat {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .progress-stat span {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+
+
+
+  /* Top 3 Critical Risks */
+  .top3-section {
+    margin-bottom: 2rem;
+    animation: fadeIn 0.7s ease 0.12s both;
+  }
+
+  .top3-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .top3-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    border-left: 3px solid var(--critical);
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .top3-card:hover { border-color: var(--critical); }
+
+  .top3-rank {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+  }
+
+  .top3-threat {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .top3-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .top3-score {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 1.6rem;
+    font-weight: 700;
+    position: absolute;
+    top: 0.6rem;
+    right: 1rem;
+    opacity: 1;
+    text-shadow: 0 0 12px currentColor;
+  }
+
+  .top3-empty {
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-style: italic;
+  }
+
+  @media (max-width: 700px) {
+    .top3-grid { grid-template-columns: 1fr; }
+  }
+
+
+  /* Risk Appetite */
+  .appetite-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .appetite-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .appetite-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 160px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .appetite-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  .appetite-val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 600;
+    min-width: 30px;
+  }
+
+  .matrix-cell.above-appetite {
+    outline: 2px solid rgba(255,255,255,0.5);
+    outline-offset: -2px;
+  }
+
+
+  /* Add Category Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open {
+    display: flex;
+  }
+
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 1.75rem;
+    width: 380px;
+    max-width: 90vw;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+  }
+
+  .modal-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .modal-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.6rem 0.85rem;
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.875rem;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 1rem;
+  }
+
+  .modal-input:focus { border-color: var(--accent); }
+
+  .modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+  }
+
+  .modal-cat-list {
+    max-height: 180px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .modal-cat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+
+  .modal-cat-item:last-child { border-bottom: none; }
+
+  .modal-cat-remove {
+    background: none;
+    border: none;
+    color: var(--critical);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    transition: background 0.2s;
+  }
+
+  .modal-cat-remove:hover { background: rgba(255,77,109,0.1); }
+
 </style>
 </head>
 <body>
@@ -729,6 +1377,40 @@
     </div>
   </div>
 
+
+
+  <!-- Top 3 Critical Risks -->
+  <div class="top3-section">
+    <div class="section-header">
+      <span class="section-title">// top risks by score</span>
+    </div>
+    <div class="top3-grid" id="top3-grid">
+      <div class="top3-card"><div class="top3-empty">Add risks to see top threats...</div></div>
+      <div class="top3-card"><div class="top3-empty"></div></div>
+      <div class="top3-card"><div class="top3-empty"></div></div>
+    </div>
+  </div>
+
+  <!-- Progress Tracker -->
+  <div class="progress-section">
+    <div class="progress-card">
+      <div class="progress-header">
+        <span class="progress-label">// mitigation progress</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-stats">
+        <div class="progress-stat">Total Risks: <span id="prog-total">0</span></div>
+        <div class="progress-stat">Mitigated: <span id="prog-mitigated" style="color:#ff9f40">0</span></div>
+        <div class="progress-stat">Accepted: <span id="prog-accepted" style="color:#7fff6e">0</span></div>
+        <div class="progress-stat">Open: <span id="prog-open" style="color:#ff4d6d">0</span></div>
+        <div class="progress-stat">In Progress: <span id="prog-inprogress" style="color:#ffd166">0</span></div>
+      </div>
+    </div>
+  </div>
+
   <!-- Meta Fields -->
   <div class="meta-row">
     <div class="field">
@@ -751,11 +1433,36 @@
     <button class="btn" onclick="addRow()">+ Add Risk</button>
   </div>
 
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <input class="filter-input" type="text" id="filter-search" placeholder="🔍 Search by Risk ID, threat, category..." oninput="applyFilters()" list="riskid-suggestions" autocomplete="off">
+    <datalist id="riskid-suggestions"></datalist>
+    <select class="filter-input" id="filter-cat" onchange="handleCatFilter()">
+      <option value="">All Categories</option>
+    </select>
+    <select class="filter-input" id="filter-rating" onchange="applyFilters()" style="min-width:130px;">
+      <option value="">All Severities</option>
+      <option>Critical</option>
+      <option>High</option>
+      <option>Medium</option>
+      <option>Low</option>
+    </select>
+    <select class="filter-input" id="filter-status" onchange="applyFilters()" style="min-width:130px;">
+      <option value="">All Statuses</option>
+      <option>Open</option>
+      <option>In Progress</option>
+      <option>Mitigated</option>
+      <option>Accepted</option>
+    </select>
+    <span class="filter-count" id="filter-count"></span>
+  </div>
+
   <div class="risk-table-wrap">
     <table id="risk-table">
       <thead>
         <tr>
           <th class="col-num">#</th>
+          <th class="col-id">Risk ID</th>
           <th class="col-threat">Risk / Threat</th>
           <th class="col-cat">Category</th>
           <th class="col-lik">Likelihood (1–5)</th>
@@ -765,6 +1472,7 @@
           <th class="col-owner">Owner</th>
           <th class="col-mit">Mitigation</th>
           <th class="col-status">Status</th>
+          <th class="col-due">Due Date</th>
           <th class="col-del">Delete</th>
         </tr>
       </thead>
@@ -772,13 +1480,182 @@
     </table>
   </div>
 
-  <!-- Risk Matrix -->
-  <div class="matrix-section">
-    <div class="section-header">
-      <span class="section-title">// risk matrix</span>
+  <!-- Risk Matrix + Chart Side by Side -->
+  <div class="matrix-chart-row">
+    <div class="matrix-col">
+      <div class="section-header">
+        <span class="section-title">// risk matrix</span>
+      </div>
+      <div class="matrix-grid" id="matrix-grid"></div>
+      <div class="appetite-controls">
+        <span class="appetite-label">Risk Appetite Threshold:</span>
+        <input type="range" class="appetite-slider" id="appetite-slider" min="1" max="25" value="12" oninput="updateAppetite(this.value)">
+        <span class="appetite-val" id="appetite-val">12</span>
+        <span class="appetite-label">(cells above threshold highlighted)</span>
+      </div>
     </div>
-    <div class="matrix-grid" id="matrix-grid"></div>
+    <div class="chart-col">
+      <div class="section-header">
+        <span class="section-title">// risk distribution by category</span>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-bars" id="chart-bars">
+          <div style="color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:0.75rem;">Add risks to see distribution...</div>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--critical)"></div>Critical</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--high)"></div>High</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--medium)"></div>Medium</div>
+          <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--low)"></div>Low</div>
+        </div>
+      </div>
+    </div>
   </div>
+
+
+
+
+
+  <!-- Quantitative Risk Section -->
+  <div class="quant-section">
+    <div class="section-header" onclick="toggleQuant()" style="cursor:pointer;user-select:none;">
+      <span class="section-title" style="font-size:1.1rem;letter-spacing:0.08em;">// quantitative risk analysis</span>
+      <span id="quant-toggle-arrow" style="font-family:'IBM Plex Mono',monospace;font-size:0.85rem;color:var(--accent);transition:transform 0.3s;display:inline-block;">▼</span>
+    </div>
+    <div id="quant-body">
+
+    <div class="quant-grid">
+
+      <!-- Risk Selector -->
+      <div style="grid-column:1/-1;">        <div style="margin-bottom:1rem;">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.65rem;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;">Link to Risk Register</div>
+          <select id="quant-risk-select" onchange="loadRiskToQuant()" style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.4rem 0.6rem;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:0.82rem;width:100%;outline:none;">
+            <option value="">— Select a risk to auto-fill Asset Value —</option>
+          </select>
+        </div></div>
+
+      <!-- SLE Card -->
+      <div class="quant-card">
+        <div class="quant-card-header">
+          <span class="quant-card-title">Single <span style="color:#ff4d6d">Loss</span> Expectancy (SLE)</span>
+          <span class="quant-card-badge">SLE</span>
+        </div>
+        <p class="quant-description">The expected monetary loss every time a risk event occurs once. Calculated by multiplying the asset value by the exposure factor.</p>
+        <div class="quant-formula">SLE = Asset Value ($) × Exposure Factor (%)</div>
+        <div class="quant-inputs">
+          <div class="quant-input-row">
+            <label>Asset Value ($)</label>
+            <input type="number" id="sle-av" placeholder="e.g. 500000" oninput="calcSLE()">
+          </div>
+          <div class="quant-input-row">
+            <label>Exposure Factor (0–1)</label>
+            <input type="number" id="sle-ef" placeholder="e.g. 0.30" min="0" max="1" step="0.01" oninput="calcSLE()">
+          </div>
+        </div>
+        <div class="quant-result">
+          <span class="quant-result-label">SLE Result</span>
+          <span class="quant-result-value" id="sle-result">$0.00</span>
+        </div>
+      </div>
+
+      <!-- EF Card -->
+      <div class="quant-card">
+        <div class="quant-card-header">
+          <span class="quant-card-title">Exposure Factor (EF)</span>
+          <span class="quant-card-badge">EF</span>
+        </div>
+        <p class="quant-description">The percentage of asset value lost if a specific threat occurs. Represents the impact severity on the asset, expressed as a decimal between 0 and 1.</p>
+        <div class="quant-formula">EF = Loss from Incident ($) ÷ Total Asset Value ($)</div>
+        <div class="quant-inputs">
+          <div class="quant-input-row">
+            <label>Loss from Incident ($)</label>
+            <input type="number" id="ef-loss" placeholder="e.g. 150000" oninput="calcEF()">
+          </div>
+          <div class="quant-input-row">
+            <label>Total Asset Value ($)</label>
+            <input type="number" id="ef-av" placeholder="e.g. 500000" oninput="calcEF()">
+          </div>
+        </div>
+        <div class="quant-result">
+          <span class="quant-result-label">EF Result</span>
+          <span class="quant-result-value" id="ef-result">0.00</span>
+        </div>
+      </div>
+
+      <!-- ARO Card -->
+      <div class="quant-card">
+        <div class="quant-card-header">
+          <span class="quant-card-title">Annual Rate of Occurrence (ARO)</span>
+          <span class="quant-card-badge">ARO</span>
+        </div>
+        <p class="quant-description">How many times a threat is expected to occur within a year. An ARO of 0.5 means once every two years. An ARO of 2 means twice per year.</p>
+        <div class="quant-formula">ARO = Number of Incidents ÷ Number of Years</div>
+        <div class="quant-inputs">
+          <div class="quant-input-row">
+            <label>Number of Incidents</label>
+            <input type="number" id="aro-incidents" placeholder="e.g. 3" oninput="calcARO()">
+          </div>
+          <div class="quant-input-row">
+            <label>Over How Many Years</label>
+            <input type="number" id="aro-years" placeholder="e.g. 5" oninput="calcARO()">
+          </div>
+        </div>
+        <div class="quant-result">
+          <span class="quant-result-label">ARO Result</span>
+          <span class="quant-result-value" id="aro-result">0.00</span>
+        </div>
+      </div>
+
+      <!-- ALE Card -->
+      <div class="quant-card">
+        <div class="quant-card-header">
+          <span class="quant-card-title">Annual <span style="color:#ff4d6d">Loss</span> Expectancy (ALE)</span>
+          <span class="quant-card-badge">ALE</span>
+        </div>
+        <p class="quant-description">The expected monetary loss for an asset due to a risk over a one-year period. This is the key metric used to justify security investment decisions.</p>
+        <div class="quant-formula">ALE = SLE × ARO</div>
+        <div class="quant-inputs">
+          <div class="quant-input-row">
+            <label>SLE ($)</label>
+            <input type="number" id="ale-sle" placeholder="e.g. 150000" oninput="calcALE()">
+          </div>
+          <div class="quant-input-row">
+            <label>ARO (times/year)</label>
+            <input type="number" id="ale-aro" placeholder="e.g. 0.5" step="0.01" oninput="calcALE()">
+          </div>
+        </div>
+        <div class="quant-result">
+          <span class="quant-result-label">ALE Result</span>
+          <span class="quant-result-value" id="ale-result">$0.00</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Summary Bar -->
+    <div class="quant-summary">
+      <div class="quant-summary-title">// quantitative summary</div>
+      <div class="quant-summary-grid">
+        <div class="quant-summary-item">
+          <div class="quant-summary-val" id="sum-sle">$0</div>
+          <div class="quant-summary-lbl">SLE</div>
+        </div>
+        <div class="quant-summary-item">
+          <div class="quant-summary-val" id="sum-ef">0.00</div>
+          <div class="quant-summary-lbl">EF</div>
+        </div>
+        <div class="quant-summary-item">
+          <div class="quant-summary-val" id="sum-aro">0.00</div>
+          <div class="quant-summary-lbl">ARO</div>
+        </div>
+        <div class="quant-summary-item">
+          <div class="quant-summary-val" id="sum-ale">$0</div>
+          <div class="quant-summary-lbl">ALE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /quant-body -->
 
   <!-- Notes -->
   <div class="notes-section">
@@ -791,14 +1668,29 @@
   <!-- Actions -->
   <div class="actions">
     <button class="btn-primary" onclick="exportCSV()">Export CSV</button>
+    <button class="btn" onclick="emailReport()">📧 Email Report</button>
     <button class="btn" onclick="printReport()">Print / Save PDF</button>
     <button class="btn danger" onclick="clearAll()">Clear All</button>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div class="modal-overlay" id="cat-modal">
+    <div class="modal-box">
+      <div class="modal-title">// <span style="color:var(--accent)">+ Add</span> / <span style="color:var(--critical)">Delete</span> Categories</div>
+      <div class="modal-cat-list" id="modal-cat-list"></div>
+      <input class="modal-input" type="text" id="new-cat-input" placeholder="New category name..." onkeydown="if(event.key==='Enter') addCategory()">
+      <div class="modal-actions">
+        <button class="btn" onclick="closeCatModal()">Cancel</button>
+        <button class="btn" onclick="addCategory()">+ Add Category</button>
+        <button class="btn-primary" onclick="applyAndClose()">✓ Apply</button>
+      </div>
+    </div>
   </div>
 
 </div>
 
 <script>
-const CATEGORIES = ['Access Control','Network Security','Data Protection','Endpoint Security','Application Security','Physical Security','Supply Chain','Compliance / Regulatory','Incident Response','Social Engineering'];
+const CATEGORIES = ['Access Control','Application Security','Compliance / Regulatory','Data Protection','Endpoint Security','Incident Response','Network Security','Physical Security','Social Engineering','Supply Chain'];
 const STATUSES = ['Open','In Progress','Mitigated','Accepted'];
 
 let rows = [];
@@ -832,11 +1724,13 @@ function getScoreColor(score) {
 }
 
 function addRow(data = {}) {
-  rowCounter++;
+  rowCounter++; 
   const id = rowCounter;
   const row = {
     id,
+    riskId: data.riskId || '',
     threat: data.threat || '',
+    due: data.due || '',
     cat: data.cat || CATEGORIES[0],
     l: data.l || 3,
     i: data.i || 3,
@@ -845,16 +1739,22 @@ function addRow(data = {}) {
     status: data.status || 'Open'
   };
   rows.push(row);
+  reassignRiskIds();
   renderTable();
   updateSummary();
   renderMatrix();
+  renderChart();
+  saveData();
 }
 
 function removeRow(id) {
   rows = rows.filter(r => r.id !== id);
+  reassignRiskIds();
   renderTable();
   updateSummary();
   renderMatrix();
+  renderChart();
+  saveData();
 }
 
 function updateRow(id, field, value) {
@@ -863,6 +1763,8 @@ function updateRow(id, field, value) {
   row[field] = field === 'l' || field === 'i' ? parseInt(value) : value;
   updateSummary();
   renderMatrix();
+  renderChart();
+  saveData();
   // update score + badge in table
   const score = row.l * row.i;
   const rating = getRating(score);
@@ -887,6 +1789,7 @@ function renderTable() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td class="row-num">${idx + 1}</td>
+      <td><input type="text" value="${escHtml(row.riskId)}" onchange="updateRow(${row.id},'riskId',this.value)" style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--accent);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.5rem;width:90px;outline:none;text-align:center;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"></td>
       <td><input type="text" value="${escHtml(row.threat)}" placeholder="Describe threat..." onchange="updateRow(${row.id},'threat',this.value)" style="min-width:220px"></td>
       <td>
         <select onchange="updateRow(${row.id},'cat',this.value)" style="min-width:180px">
@@ -932,10 +1835,11 @@ function renderTable() {
         </div>
       </td>
       <td>
-        <select onchange="updateRow(${row.id},'status',this.value)" style="min-width:130px">
+        <select onchange="updateRow(${row.id},'status',this.value); applyStatusColor(this, this.value)" id="status-sel-${row.id}" class="status-select ${getStatusClass(row.status)}" style="min-width:130px;font-weight:600;border:1px solid;border-radius:4px;padding:0.35rem 0.6rem;outline:none;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;font-size:0.82rem;">
           ${STATUSES.map(s=>`<option value="${s}" ${s===row.status?'selected':''}>${s}</option>`).join('')}
         </select>
       </td>
+      <td><input type="date" value="${row.due}" onchange="updateRow(${row.id},'due',this.value)" style="background:transparent;border:1px solid var(--border);border-radius:4px;padding:0.35rem 0.5rem;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:0.82rem;outline:none;width:100%;"></td>
       <td style="text-align:center"><button class="btn danger" onclick="removeRow(${row.id})" style="padding:0.35rem 0.8rem;font-size:0.72rem;letter-spacing:0.05em">🗑 Delete</button></td>
     `;
     tbody.appendChild(tr);
@@ -953,6 +1857,9 @@ function updateSummary() {
   document.getElementById('cnt-high').textContent = counts.High;
   document.getElementById('cnt-medium').textContent = counts.Medium;
   document.getElementById('cnt-low').textContent = counts.Low;
+  updateProgress();
+  updateQuantSelect();
+  renderTop3();
 }
 
 function renderMatrix() {
@@ -1031,10 +1938,10 @@ function exportCSV() {
   const assessor = document.getElementById('assessor').value;
   const date = document.getElementById('adate').value;
   let csv = `Risk Assessment\nOrganization: ${org}\nAssessor: ${assessor}\nDate: ${date}\n\n`;
-  csv += '#,Risk / Threat,Category,Likelihood,Impact,Score,Rating,Owner,Mitigation,Status\n';
+  csv += '#,Risk ID,Risk / Threat,Category,Likelihood,Impact,Score,Rating,Owner,Mitigation,Status,Due Date\n';
   rows.forEach((r, i) => {
     const score = r.l * r.i;
-    csv += `${i+1},"${r.threat}","${r.cat}",${r.l},${r.i},${score},${getRating(score)},"${r.owner}","${r.mitigation}","${r.status}"\n`;
+    csv += `${i+1},"${r.riskId}","${r.threat}","${r.cat}",${r.l},${r.i},${score},${getRating(score)},"${r.owner}","${r.mitigation}","${r.status}","${r.due}"\n`;
   });
   const notes = document.getElementById('notes').value;
   if (notes) csv += `\nNotes:\n"${notes}"\n`;
@@ -1056,11 +1963,421 @@ function clearAll() {
   renderTable();
   updateSummary();
   renderMatrix();
+  renderChart();
+  saveData();
 }
+
+
+
+function applyStatusColor(el, status) {
+  el.className = 'status-select ' + getStatusClass(status);
+}
+
+function applyAllStatusColors() {
+  rows.forEach(function(r) {
+    var el = document.getElementById('status-sel-' + r.id);
+    if (el) applyStatusColor(el, r.status);
+  });
+}
+
+
+
+function updateQuantSelect() {
+  var sel = document.getElementById('quant-risk-select');
+  if (!sel) return;
+  var current = sel.value;
+  sel.innerHTML = '<option value="">— Select a risk to auto-fill Asset Value —</option>';
+  rows.forEach(function(r) {
+    var score = r.l * r.i;
+    var rating = getRating(score);
+    var opt = document.createElement('option');
+    opt.value = r.id;
+    opt.textContent = r.riskId + ' — ' + (r.threat || 'Unnamed risk') + ' (' + rating + ')';
+    sel.appendChild(opt);
+  });
+  if (current) sel.value = current;
+  // Update search datalist with current Risk IDs
+  var dl = document.getElementById('riskid-suggestions');
+  if (dl) {
+    dl.innerHTML = '';
+    rows.forEach(function(r) {
+      var opt = document.createElement('option');
+      opt.value = r.riskId;
+      opt.label = r.threat || 'Unnamed risk';
+      dl.appendChild(opt);
+    });
+  }
+}
+
+function loadRiskToQuant() {
+  var sel = document.getElementById('quant-risk-select');
+  if (!sel || !sel.value) return;
+  var id = parseInt(sel.value);
+  var row = rows.find(function(r) { return r.id === id; });
+  if (!row) return;
+  var score = row.l * row.i;
+  var assetGuess = score * 10000;
+  var avInput = document.getElementById('sle-av');
+  if (avInput) { avInput.value = assetGuess; calcSLE(); }
+}
+
+function applyFilters() {
+  var search = document.getElementById('filter-search').value.toLowerCase();
+  var cat = document.getElementById('filter-cat').value;
+  var rating = document.getElementById('filter-rating').value;
+  var status = document.getElementById('filter-status').value;
+  var tbody = document.getElementById('risk-body');
+  var trs = tbody.querySelectorAll('tr');
+  var visible = 0;
+  trs.forEach(function(tr, idx) {
+    var row = rows[idx];
+    if (!row) return;
+    var score = row.l * row.i;
+    var rowRating = getRating(score);
+    var matchSearch = !search || row.riskId.toLowerCase().includes(search) || row.threat.toLowerCase().includes(search) || row.cat.toLowerCase().includes(search) || (row.mitigation && row.mitigation.toLowerCase().includes(search)) || (row.owner && row.owner.toLowerCase().includes(search));
+    var matchCat = !cat || row.cat === cat;
+    var matchRating = !rating || rowRating === rating;
+    var matchStatus = !status || row.status === status;
+    if (matchSearch && matchCat && matchRating && matchStatus) {
+      tr.style.display = '';
+      visible++;
+    } else {
+      tr.style.display = 'none';
+    }
+  });
+  var countEl = document.getElementById('filter-count');
+  if (countEl) countEl.textContent = 'Showing ' + visible + ' of ' + rows.length;
+}
+
+function updateProgress() {
+  var total = rows.length;
+  var mitigated = rows.filter(function(r) { return r.status === 'Mitigated'; }).length;
+  var accepted = rows.filter(function(r) { return r.status === 'Accepted'; }).length;
+  var open = rows.filter(function(r) { return r.status === 'Open'; }).length;
+  var inprogress = rows.filter(function(r) { return r.status === 'In Progress'; }).length;
+  var resolved = mitigated + accepted;
+  var pct = total > 0 ? Math.round((resolved / total) * 100) : 0;
+
+  var pctEl = document.getElementById('progress-pct');
+  var fillEl = document.getElementById('progress-fill');
+  var totalEl = document.getElementById('prog-total');
+  var mitEl = document.getElementById('prog-mitigated');
+  var accEl = document.getElementById('prog-accepted');
+  var openEl = document.getElementById('prog-open');
+  var ipEl = document.getElementById('prog-inprogress');
+
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (fillEl) fillEl.style.width = pct + '%';
+  if (totalEl) totalEl.textContent = total;
+  if (mitEl) mitEl.textContent = mitigated;
+  if (accEl) accEl.textContent = accepted;
+  if (openEl) openEl.textContent = open;
+  if (ipEl) ipEl.textContent = inprogress;
+}
+
+function renderTop3() {
+  var grid = document.getElementById('top3-grid');
+  if (!grid) return;
+  var sorted = rows.slice().sort(function(a, b) { return (b.l * b.i) - (a.l * a.i); });
+  var top3 = sorted.slice(0, 3);
+  var borderColors = ['var(--critical)', 'var(--high)', 'var(--medium)'];
+  var rankLabels = ['#1 Highest Risk', '#2 High Risk', '#3 Notable Risk'];
+  var html = '';
+  for (var i = 0; i < 3; i++) {
+    var r = top3[i];
+    if (r) {
+      var score = r.l * r.i;
+      var rating = getRating(score);
+      var bc = score >= 20 ? 'var(--critical)' : score >= 12 ? 'var(--high)' : score >= 6 ? 'var(--medium)' : 'var(--low)';
+      html += '<div class="top3-card" style="border-left-color:' + bc + '">';
+      html += '<div class="top3-score" style="color:' + bc + '">' + score + '</div>';
+      html += '<div class="top3-rank">' + rankLabels[i] + ' &nbsp;·&nbsp; ' + r.riskId + '</div>';
+      html += '<div class="top3-threat">' + (r.threat || 'Unnamed risk') + '</div>';
+      html += '<div class="top3-meta"><span class="risk-badge ' + getBadgeClass(rating) + '">' + rating + '</span>';
+      html += '<span style="font-size:0.68rem;color:var(--muted);">' + r.cat + '</span></div>';
+      html += '</div>';
+    } else {
+      html += '<div class="top3-card"><div class="top3-empty">' + (i === 0 ? 'Add risks to see top threats...' : '') + '</div></div>';
+    }
+  }
+  grid.innerHTML = html;
+}
+
+function updateAppetite(val) {
+  var valEl = document.getElementById('appetite-val');
+  if (valEl) valEl.textContent = val;
+  var cells = document.querySelectorAll('.matrix-cell');
+  cells.forEach(function(cell) {
+    var score = parseInt(cell.textContent);
+    if (!isNaN(score)) {
+      if (score > parseInt(val)) {
+        cell.style.outline = '2px solid rgba(255,255,255,0.6)';
+        cell.style.outlineOffset = '-2px';
+      } else {
+        cell.style.outline = 'none';
+      }
+    }
+  });
+}
+
+function emailReport() {
+  var org = document.getElementById('org').value || 'Organization';
+  var assessor = document.getElementById('assessor').value || 'Assessor';
+  var date = document.getElementById('adate').value || new Date().toISOString().split('T')[0];
+  var counts = { Critical: 0, High: 0, Medium: 0, Low: 0 };
+  rows.forEach(function(r) { counts[getRating(r.l * r.i)]++; });
+  var subject = 'GRC Risk Assessment Report — ' + org + ' (' + date + ')';
+  var body = 'GRC Risk Assessment Report\n';
+  body += '================================\n';
+  body += 'Organization: ' + org + '\n';
+  body += 'Assessed By: ' + assessor + '\n';
+  body += 'Date: ' + date + '\n';
+  body += 'Total Risks: ' + rows.length + '\n\n';
+  body += 'Risk Summary:\n';
+  body += '  Critical: ' + counts.Critical + '\n';
+  body += '  High: ' + counts.High + '\n';
+  body += '  Medium: ' + counts.Medium + '\n';
+  body += '  Low: ' + counts.Low + '\n\n';
+  body += 'Top Risks:\n';
+  var sorted = rows.slice().sort(function(a,b){ return (b.l*b.i)-(a.l*a.i); }).slice(0,5);
+  sorted.forEach(function(r, i) {
+    body += (i+1) + '. [' + r.riskId + '] ' + (r.threat || 'Unnamed') + ' — Score: ' + (r.l*r.i) + ' (' + getRating(r.l*r.i) + ')\n';
+  });
+  var notes = document.getElementById('notes').value;
+  if (notes) { body += '\nNotes:\n' + notes + '\n'; }
+  body += '\n— Generated by GRC Risk Assessment Tool © 2026 Orlando';
+  window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+}
+
+function reassignRiskIds() {
+  rows.forEach(function(r, idx) {
+    r.riskId = 'RISK-' + String(idx + 1).padStart(3, '0');
+  });
+}
+
+
+function populateCatFilter() {
+  var sel = document.getElementById('filter-cat');
+  if (!sel) return;
+  var current = sel.value;
+  sel.innerHTML = '<option value="">All Categories</option>';
+  var sorted = CATEGORIES.slice().sort();
+  sorted.forEach(function(c) {
+    var opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    sel.appendChild(opt);
+  });
+  // Add Category option at bottom
+  var divider = document.createElement('option');
+  divider.disabled = true;
+  divider.textContent = '─────────────────';
+  sel.appendChild(divider);
+  var addOpt = document.createElement('option');
+  addOpt.value = '__add__';
+  addOpt.textContent = '+ Add / Delete Categories...';
+  addOpt.style.color = '#00e5ff';
+  addOpt.style.fontStyle = 'italic';
+  sel.appendChild(addOpt);
+  if (current && current !== '__add__') sel.value = current;
+}
+
+function handleCatFilter() {
+  var sel = document.getElementById('filter-cat');
+  if (sel.value === '__add__') {
+    sel.value = '';
+    openCatModal();
+    return;
+  }
+  applyFilters();
+}
+
+function openCatModal() {
+  renderModalCatList();
+  document.getElementById('cat-modal').classList.add('open');
+  document.getElementById('new-cat-input').focus();
+}
+
+
+function applyAndClose() {
+  populateCatFilter();
+  renderTable();
+  saveData();
+  closeCatModal();
+}
+
+function closeCatModal() {
+  document.getElementById('cat-modal').classList.remove('open');
+  document.getElementById('new-cat-input').value = '';
+}
+
+function renderModalCatList() {
+  var list = document.getElementById('modal-cat-list');
+  if (!list) return;
+  var sorted = CATEGORIES.slice().sort();
+  var defaultCats = ['Access Control','Application Security','Compliance / Regulatory','Data Protection',
+    'Endpoint Security','Incident Response','Network Security','Physical Security',
+    'Social Engineering','Supply Chain'];
+  var html = '';
+  sorted.forEach(function(c) {
+    var isDefault = defaultCats.indexOf(c) !== -1;
+    html += '<div class="modal-cat-item">';
+    html += '<span>' + c + '</span>';
+    if (isDefault) {
+      html += '<span style="font-size:0.65rem;color:var(--muted);">default</span>';
+    } else {
+      html += '<button class="modal-cat-remove" onclick="removeCategory(this)" data-cat="' + c + '" title="Remove">✕</button>';
+    }
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
+function addCategory() {
+  var input = document.getElementById('new-cat-input');
+  var val = input.value.trim();
+  if (!val) return;
+  if (CATEGORIES.indexOf(val) !== -1) {
+    input.style.borderColor = 'var(--critical)';
+    setTimeout(function() { input.style.borderColor = ''; }, 1000);
+    return;
+  }
+  CATEGORIES.push(val);
+  CATEGORIES.sort();
+  input.value = '';
+  renderModalCatList();
+  populateCatFilter();
+  renderTable();
+  saveData();
+}
+
+function removeCategory(btn) {
+  var cat = btn.getAttribute('data-cat');
+  var inUse = rows.some(function(r) { return r.cat === cat; });
+  if (inUse) {
+    alert('Cannot remove "' + cat + '" — it is assigned to one or more risks.');
+    return;
+  }
+  var idx = CATEGORIES.indexOf(cat);
+  if (idx !== -1) CATEGORIES.splice(idx, 1);
+  renderModalCatList();
+  populateCatFilter();
+  saveData();
+}
+
+// Close modal on overlay click
+document.getElementById('cat-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeCatModal();
+});
+
+
+function toggleQuant() {
+  var body = document.getElementById('quant-body');
+  var arrow = document.getElementById('quant-toggle-arrow');
+  if (!body) return;
+  if (body.style.display === 'none') {
+    body.style.display = '';
+    arrow.style.transform = 'rotate(0deg)';
+  } else {
+    body.style.display = 'none';
+    arrow.style.transform = 'rotate(-90deg)';
+  }
+}
+
+function getStatusClass(status) {
+  if (status === 'Open') return 'status-open';
+  if (status === 'In Progress') return 'status-inprogress';
+  if (status === 'Mitigated') return 'status-mitigated';
+  if (status === 'Accepted') return 'status-accepted';
+  return '';
+}
+
+function renderChart() {
+  var container = document.getElementById('chart-bars');
+  if (!container) return;
+  if (rows.length === 0) {
+    container.innerHTML = '<div style="color:#64748b;font-family:monospace;font-size:0.75rem;">Add risks to see distribution...</div>';
+    return;
+  }
+  var catCounts = {};
+  rows.forEach(function(r) {
+    if (!catCounts[r.cat]) catCounts[r.cat] = { Critical:0, High:0, Medium:0, Low:0, total:0 };
+    var rating = getRating(r.l * r.i);
+    catCounts[r.cat][rating]++;
+    catCounts[r.cat].total++;
+  });
+  var maxCount = 0;
+  Object.keys(catCounts).forEach(function(k) { if (catCounts[k].total > maxCount) maxCount = catCounts[k].total; });
+  var sorted = Object.keys(catCounts).sort(function(a,b) { return catCounts[b].total - catCounts[a].total; });
+  var html = '';
+  sorted.forEach(function(cat) {
+    var counts = catCounts[cat];
+    var pct = maxCount > 0 ? (counts.total / maxCount) * 100 : 0;
+    var barColor = counts.Critical > 0 ? '#ff4d6d' : counts.High > 0 ? '#ff9f40' : counts.Medium > 0 ? '#ffd166' : '#7fff6e';
+    html += '<div class="chart-row">';
+    html += '<div class="chart-label" title="' + cat + '">' + cat + '</div>';
+    html += '<div class="chart-bar-track">';
+    html += '<div class="chart-bar-fill" style="width:' + pct + '%;background:' + barColor + '">';
+    html += '<span class="chart-bar-count">' + counts.total + '</span>';
+    html += '</div></div></div>';
+  });
+  container.innerHTML = html;
+}
+
+function saveData() {
+  try {
+    var data = {
+      org: document.getElementById('org').value,
+      assessor: document.getElementById('assessor').value,
+      adate: document.getElementById('adate').value,
+      notes: document.getElementById('notes').value,
+      rows: rows,
+      categories: CATEGORIES
+    };
+    localStorage.setItem('grc-risk-data', JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadData() {
+  try {
+    var saved = localStorage.getItem('grc-risk-data');
+    if (!saved) return false;
+    var data = JSON.parse(saved);
+    document.getElementById('org').value = data.org || '';
+    document.getElementById('assessor').value = data.assessor || '';
+    document.getElementById('adate').value = data.adate || new Date().toISOString().split('T')[0];
+    document.getElementById('notes').value = data.notes || '';
+    // Restore custom categories
+    if (data.categories && data.categories.length > 0) {
+      data.categories.forEach(function(c) {
+        if (CATEGORIES.indexOf(c) === -1) CATEGORIES.push(c);
+      });
+      CATEGORIES.sort();
+    }
+    if (data.rows && data.rows.length > 0) {
+      data.rows.forEach(function(r) {
+        rowCounter = Math.max(rowCounter, r.id);
+        rows.push(r);
+      });
+      renderTable();
+      updateSummary();
+      renderMatrix();
+      renderChart();
+      populateCatFilter();
+      return true;
+    }
+  } catch(e) {}
+  return false;
+}
+
+document.addEventListener('change', saveData);
+document.addEventListener('input', saveData);
 
 // Init
 document.getElementById('adate').value = new Date().toISOString().split('T')[0];
-defaultRisks.forEach(r => addRow(r));
+populateCatFilter();
+if (!loadData()) { defaultRisks.forEach(r => addRow(r)); }
+updateQuantSelect();
 
 function toggleMit(id, previewEl) {
   const drop = document.getElementById('mit-drop-' + id);
@@ -1129,8 +2446,51 @@ document.addEventListener('click', function(e) {
   }
 });
 
+
+function fmt(n) {
+  return '<span style="color:#00c853">$</span> ' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function calcSLE() {
+  const av = parseFloat(document.getElementById('sle-av').value) || 0;
+  const ef = parseFloat(document.getElementById('sle-ef').value) || 0;
+  const sle = av * ef;
+  document.getElementById('sle-result').innerHTML = fmt(sle);
+  document.getElementById('sum-sle').innerHTML = fmt(sle);
+}
+
+function calcEF() {
+  const loss = parseFloat(document.getElementById('ef-loss').value) || 0;
+  const av = parseFloat(document.getElementById('ef-av').value) || 1;
+  const ef = av > 0 ? loss / av : 0;
+  document.getElementById('ef-result').textContent = ef.toFixed(4);
+  document.getElementById('sum-ef').textContent = ef.toFixed(4);
+}
+
+function calcARO() {
+  const incidents = parseFloat(document.getElementById('aro-incidents').value) || 0;
+  const years = parseFloat(document.getElementById('aro-years').value) || 1;
+  const aro = years > 0 ? incidents / years : 0;
+  document.getElementById('aro-result').textContent = aro.toFixed(2);
+  document.getElementById('sum-aro').textContent = aro.toFixed(2);
+}
+
+function calcALE() {
+  const sle = parseFloat(document.getElementById('ale-sle').value) || 0;
+  const aro = parseFloat(document.getElementById('ale-aro').value) || 0;
+  const ale = sle * aro;
+  document.getElementById('ale-result').innerHTML = fmt(ale);
+  document.getElementById('sum-ale').innerHTML = fmt(ale);
+}
+
+
+
+
 </script>
 
 <div style="text-align:center; padding: 2rem 0 1rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: #64748b; letter-spacing: 0.1em;">
   © 2026 Orlando · GRC Risk Assessment Tool · All Rights Reserved
 </div>
+
+</body>
+</html>
